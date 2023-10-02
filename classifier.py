@@ -37,7 +37,7 @@ class MainClassifier(nn.Module):
 def initialize_model(dataloader_train, device="cpu", epochs=3):
     classifier = MainClassifier()
     classifier.to(device)
-    optimizer = AdamW(classifier.parameters, lr=5e-5, eps=1e-8)
+    optimizer = AdamW(classifier.parameters(), lr=5e-5, eps=1e-8)
     total_steps  = len(dataloader_train) * epochs
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=total_steps)
     return classifier, optimizer, scheduler
