@@ -16,9 +16,7 @@ from classifier import initialize_model
 from tokenizer_local import tokenization
 from config import MAX_LENGTH, BATCH_SIZE,TRAIN_DATA_PATH, VAL_DATA_PATH,device_GPU_CPU,FINAL_TRAIN_MODEL_PATH
 from data_prepocess import data_preprocess
-
 torch.cuda.empty_cache()
-
 # Configuration of device
 device = device_GPU_CPU()
 
@@ -61,13 +59,15 @@ def evaluate(model, val_dataloader,labels_test):
     val_loss = np.mean(val_loss)
     val_accuracy = np.mean(val_accuracy)
     all_logits= torch.cat(all_logits, dim=0)
+    
     # probabilities 
     probs = F.softmax(all_logits, dim=1).cpu().numpy()
-
+    labels_test = labels_test.ravel()
+    
     # AUC of multiclass
-    roc_auc = roc_auc_score(labels_test, probs, multi_class='ovr')
-    return val_loss, val_accuracy, roc_auc
 
+    # roc_auc = roc_auc_score(labels_test,probs,multi_class='ovr')
+    return val_loss, val_accuracy#,roc_auc
 
 def train(model, train_dataloader, optimizer, scheduler, labels_test, val_dataloader=None, epochs=3, evaluation=False):
     print("Start training...\n")
@@ -99,16 +99,14 @@ def train(model, train_dataloader, optimizer, scheduler, labels_test, val_datalo
             total_loss += loss.item()
             # Perform a backward pass to calculate gradients
             loss.backward()
-
             # Clip the norm of the gradients to 1.0 to prevent "exploding gradients"
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-
             # Update parameters and the learning rate
             optimizer.step()
             scheduler.step()
 
             # Print the loss values and time elapsed for every 20 batches
-            if (step % 10000 == 0 and step != 0) or (step == len(train_dataloader) - 1):
+            if (step % 100 == 0 and step != 0) or (step == len(train_dataloader) - 1):
                 # Calculate time elapsed for 10000 batches
                 time_elapsed = time.time() - t0_batch
 
@@ -129,7 +127,7 @@ def train(model, train_dataloader, optimizer, scheduler, labels_test, val_datalo
         if evaluation == True:
             # After the completion of each training epoch, measure the model's performance
             # on our validation set.
-            val_loss, val_accuracy,auc= evaluate(model, val_dataloader, labels_test)
+            val_loss, val_accuracy= evaluate(model, val_dataloader, labels_test)
             min_loss = np.inf
             if val_loss < min_loss:
                 min_loss = val_loss
@@ -138,7 +136,7 @@ def train(model, train_dataloader, optimizer, scheduler, labels_test, val_datalo
                 print("model saved")
             # Print performance over the entire training data
             time_elapsed = time.time() - t0_epoch 
-            print(f"{epoch_i + 1:^7} | {'-':^7} | {avg_train_loss:^12.6f} | {val_loss:^10.6f} | {val_accuracy:^9.2f} | {auc:.4f} | {time_elapsed:^9.2f}")
+            print(f"{epoch_i + 1:^7} | {'-':^7} | {avg_train_loss:^12.6f} | {val_loss:^10.6f} | {val_accuracy:^9.2f} | {time_elapsed:^9.2f}")
             print("-"*70)
         print("\n")
     #torch.save(model.state_dict(),path_modele)
