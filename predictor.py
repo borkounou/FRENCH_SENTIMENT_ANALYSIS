@@ -16,6 +16,7 @@ device = device_GPU_CPU()
 
 
 def predict_test(model, test_dataloader):
+    model.eval()
     all_logits = []
     for batch in test_dataloader:
         b_input_ids, b_attn_mask= tuple(t.to(device) for t in batch)
