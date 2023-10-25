@@ -1,5 +1,14 @@
 from main_trainer import execute
 from predictor import predictor, sing_predictor
+from fastapi import FastAPI, status, Request
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
+import json
+
+app = FastAPI()
+app.mount("/static",StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
 
 if __name__ == "__main__":
      
