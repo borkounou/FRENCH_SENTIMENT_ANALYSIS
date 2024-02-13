@@ -10,7 +10,7 @@ BATCH_SIZE = 8
 
 RESULT_PATH = "simple_test.txt"
 
-FINAL_TRAIN_MODEL_PATH = "BorkounouBERT.h5"
+FINAL_TRAIN_MODEL_PATH = "./BorkounouBERT.h5"
 
 def device_GPU_CPU():
     if torch.cuda.is_available():

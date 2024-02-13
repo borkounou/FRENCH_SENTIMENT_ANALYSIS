@@ -13,7 +13,7 @@ from config import MAX_LENGTH, BATCH_SIZE, FINAL_TRAIN_MODEL_PATH, RESULT_PATH,T
 
 
 device = device_GPU_CPU()
-
+print(device_GPU_CPU)
 
 def predict_test(model, test_dataloader):
     model.eval()
